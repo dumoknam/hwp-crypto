@@ -23,11 +23,24 @@ const CLEAN_FILE_HEADER = Buffer.from(
   "hex",
 );
 
-function isPasswordProtected(cfbFile: CFB.CFB$Container): boolean {
+function getFileHeaderFlags(cfbFile: CFB.CFB$Container): number {
   const entry = CFB.find(cfbFile, "/FileHeader");
-  if (!entry?.content) return false;
-  const flags = entry.content[36];
-  return (flags & 0x02) !== 0;
+  if (!entry?.content) return 0;
+  return entry.content[36];
+}
+
+function getEncryptVersion(cfbFile: CFB.CFB$Container): number {
+  const entry = CFB.find(cfbFile, "/FileHeader");
+  if (!entry?.content || entry.content.length < 48) return 0;
+  return Buffer.from(entry.content).readUInt32LE(44);
+}
+
+function isPasswordProtected(cfbFile: CFB.CFB$Container): boolean {
+  return (getFileHeaderFlags(cfbFile) & 0x02) !== 0;
+}
+
+function isDistributionDocument(cfbFile: CFB.CFB$Container): boolean {
+  return (getFileHeaderFlags(cfbFile) & 0x04) !== 0;
 }
 
 function listSectionStreams(cfbFile: CFB.CFB$Container): string[] {
@@ -64,8 +77,29 @@ function verifyPassword(key: Buffer, docInfoData: Buffer): void {
 export function decryptHwp(input: Buffer, password: string): Buffer {
   const cfbFile = CFB.read(input, { type: "buffer" });
 
+  if (isDistributionDocument(cfbFile) && !isPasswordProtected(cfbFile)) {
+    throw new Error(
+      "This is a distribution-protected document (배포용 문서). " +
+        "Distribution document decryption is not yet supported.",
+    );
+  }
+
   if (!isPasswordProtected(cfbFile)) {
     throw new Error("File is not password-protected.");
+  }
+
+  const encVer = getEncryptVersion(cfbFile);
+  if (encVer !== 0 && encVer !== 4) {
+    throw new Error(
+      `Unsupported EncryptVersion ${encVer}. Only EncryptVersion 4 (한글 7.0+) is supported.`,
+    );
+  }
+
+  if (isDistributionDocument(cfbFile)) {
+    throw new Error(
+      "This file has both password encryption and distribution protection. " +
+        "Distribution document decryption is not yet supported.",
+    );
   }
 
   const key = deriveKey(password);
