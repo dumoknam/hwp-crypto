@@ -1,0 +1,39 @@
+{
+  "name": "hwp-crypto",
+  "version": "0.1.0",
+  "description": "Decrypt password-protected HWP files",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "bin": {
+    "hwp-crypto": "./dist/cli.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "test": "node --test dist/test/cipher.test.js",
+    "prepublishOnly": "npm run build && npm test"
+  },
+  "keywords": [
+    "hwp",
+    "hancom",
+    "decrypt",
+    "password"
+  ],
+  "license": "MIT",
+  "dependencies": {
+    "cfb": "^1.2.2"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "typescript": "^5.5.0"
+  }
+}
