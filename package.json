@@ -1,7 +1,7 @@
 {
   "name": "hwp-crypto",
   "version": "0.1.1",
-  "description": "Decrypt password-protected HWP files and extract text",
+  "description": "Decrypt password-protected HWP/HWPX files and extract text",
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -19,11 +19,12 @@
   },
   "scripts": {
     "build": "tsc",
-    "test": "node --test dist/test/cipher.test.js",
+    "test": "node --test dist/test/cipher.test.js dist/test/hwpx.test.js",
     "prepublishOnly": "npm run build && npm test"
   },
   "keywords": [
     "hwp",
+    "hwpx",
     "hancom",
     "decrypt",
     "password"
@@ -34,9 +35,11 @@
   },
   "license": "MIT",
   "dependencies": {
+    "adm-zip": "^0.5.17",
     "cfb": "^1.2.2"
   },
   "devDependencies": {
+    "@types/adm-zip": "^0.5.8",
     "@types/node": "^20.0.0",
     "typescript": "^5.5.0"
   }
