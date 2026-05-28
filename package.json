@@ -28,6 +28,10 @@
     "decrypt",
     "password"
   ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/dumoknam/hwp-crypto.git"
+  },
   "license": "MIT",
   "dependencies": {
     "cfb": "^1.2.2"
