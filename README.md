@@ -1,6 +1,6 @@
 # hwp-crypto
 
-Decrypt password-protected HWP (한글) files.
+Decrypt password-protected HWP (한글) files and extract text.
 
 Supports HWP 5.0 files encrypted with EncryptVersion 4 (한글 7.0+).
 
@@ -12,15 +12,32 @@ npm install hwp-crypto
 
 ## Usage
 
-### Library
+### Extract text from a password-protected file
 
 ```typescript
-import { decryptHwp } from "hwp-crypto";
-import { readFileSync, writeFileSync } from "fs";
+import { decryptHwp, extractText } from "hwp-crypto";
+import { readFileSync } from "fs";
 
 const encrypted = readFileSync("secret.hwp");
 const decrypted = decryptHwp(encrypted, "password");
-writeFileSync("decrypted.hwp", decrypted);
+console.log(extractText(decrypted));
+```
+
+### Extract text from a normal file
+
+```typescript
+import { extractText } from "hwp-crypto";
+import { readFileSync } from "fs";
+
+console.log(extractText(readFileSync("document.hwp")));
+```
+
+### Decrypt and save
+
+```typescript
+import { decryptHwpFile } from "hwp-crypto";
+
+decryptHwpFile("secret.hwp", "password", "decrypted.hwp");
 ```
 
 ### CLI
@@ -40,6 +57,10 @@ Throws if the password is wrong or the file is not password-protected.
 ### `decryptHwpFile(inputPath: string, password: string, outputPath: string): void`
 
 Reads, decrypts, and writes to disk.
+
+### `extractText(input: Buffer): string`
+
+Extracts all text from an HWP file buffer, including text inside tables and nested controls. Works with both encrypted (after `decryptHwp`) and normal HWP files.
 
 ### `deriveKey(password: string): Buffer`
 
